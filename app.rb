@@ -1,38 +1,38 @@
 require_relative 'time_format'
 class App
-  include TimeFormat
   def call(env)
-    @query_string = env['QUERY_STRING']
-    @request_path = env['REQUEST_PATH']
-    time_format(request_format)
-    [status, header, body]
+    request = Rack::Request.new(env)
+    @format = request.params['format']
+    @request_path = request.path
+    @time_format = TimeFormat.new(request_format)
+    make_response
   end
 
   private
 
   def status
     return 404 if @request_path != '/time'
-    return 400 if bad_time_format?
+    return 400 if @time_format.bad_time_format?
     200
   end
 
-  def header
-    { 'content-type' => 'text-plain' }
+  def make_response
+    headers = { 'content-type' => 'text-plain' }
+    [status, headers, ["#{body}\n"]]
   end
 
   def body
-    return ["Path not foumd\n"] if @request_path != '/time'
-    if bad_time_format?
-      ["Unknown time format #{@unknown_format}\n"]
+    return 'Path not foumd' if @request_path != '/time'
+    if @time_format.bad_time_format?
+      "Unknown time format #{@time_format.unknown_format}"
     else
-      set_format_time
-      [Time.now.strftime(@time_format) + "\n"]
+      @time_format.set_time
     end
   end
 
   private
 
   def request_format
-    @query_string.partition("format=").last.split("%2C")
+    @format.split(',')
   end
 end
