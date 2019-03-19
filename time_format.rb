@@ -15,7 +15,7 @@ class TimeFormat
   end
 
   def set_time
-    Time.now.strftime(set_format_time) unless @format_time.empty?
+    Time.now.strftime(format_time) unless @format_time.empty?
   end
 
   def bad_time_format?
@@ -24,7 +24,7 @@ class TimeFormat
 
   private
 
-  def set_format_time
+  def format_time
     @format_time.map { |format| FORMATS[format] }.join("-")
   end
 
