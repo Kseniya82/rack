@@ -26,7 +26,7 @@ class App
     make_response(200, format)
   end
 
-  def make_response(status, body)
-      [status, headers = { 'content-type' => 'text-plain' }, ["#{body}\n"]]
+  def make_response(status, headers = { 'content-type' => 'text-plain' }, body)
+    [status, headers, ["#{body}\n"]]
   end
 end
